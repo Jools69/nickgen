@@ -1,0 +1,35 @@
+.NickGenerator {
+    background: #383c44;
+    padding: 30px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    width: 80%;
+}
+
+.Colours {
+    display: flex;
+    height: 100px;
+    align-items: center;
+}
+
+.Char {
+    /* height: 50px;
+    width: 30px; */
+    letter-spacing: 0.3em;
+    font-size: 1.2em;
+}
+
+.nameInput {
+    font-size: 0.8em;
+}
+
+.nameInput input[type="text"] {
+    padding: 5px;
+    margin: 10px 0 0 0;
+    font-size: 0.7em;
+    outline: none;
+    text-align: center;
+}

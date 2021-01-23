@@ -1,23 +1,24 @@
-import logo from './logo.svg';
 import './App.css';
+import NickGenerator from './NickGenerator';
+import Footer from './Footer';
 
 function App() {
+  
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h1>Welcome to  <span style={{color:"#ff00ff"}}>N</span>
+                        <span style={{color:"#f167e1"}}>i</span>
+                        <span style={{color:"#e091c2"}}>c</span>
+                        <span style={{color:"#c9b2a2"}}>k</span>
+                        <span style={{color:"#abce80"}}>G</span>
+                        <span style={{color:"#7fe757"}}>e</span>
+                        <span style={{color:"#00ff00"}}>n</span>
+                        </h1>
+        <h3>A coloured nickname generator for Minecraft</h3>
+        <NickGenerator />
       </header>
+      <Footer className="App-footer"/>
     </div>
   );
 }

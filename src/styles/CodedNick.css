@@ -1,0 +1,43 @@
+.codedNick{
+    max-width: 90%;
+}
+
+.commandString {
+    font-size: 0.5em;
+    overflow-wrap: break-word;
+    background: #fff;
+    margin: 20px auto;
+    border-radius: 5px;
+
+}
+
+.commandString p {
+    margin: 20px auto;
+    padding: 15px 15px;
+    color: #000;
+}
+
+.copyButton {
+    margin: 15px 0 0 0 ;
+    width: 120px;
+    height: 40px;
+    border-radius: 5px;
+    background: #fff;
+    padding: 5px;
+    color: gray;
+    font-size: 0.7em;
+    font-weight: bold;
+    border: none;
+    outline: none;
+}
+
+.copyButton:hover {
+    background: #eee;
+    box-shadow:  black 5px 5px 10px;
+    cursor: pointer;
+}
+
+.copyButton:active {
+    box-shadow: black 1px 1px 5px;
+    transform: translateY(4px) translateX(4px);
+}
