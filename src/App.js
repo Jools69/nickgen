@@ -15,7 +15,7 @@ function App() {
                         <span style={{color:"#7fe757"}}>e</span>
                         <span style={{color:"#00ff00"}}>n</span>
                         </h1>
-        <h3>A coloured nickname generator for Minecraft</h3>
+        <h3>Jools's coloured nickname generator for Minecraft</h3>
         <NickGenerator />
       </header>
       <Footer className="App-footer"/>

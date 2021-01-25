@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import chroma from 'chroma-js';
 import ColoursSlider from './ColoursSlider';
 import ColourPickers from './ColourPickers';
 import './styles/NickGenerator.css';
 import CodedNick from './CodedNick';
+import useLocalStorageState from './hooks/useLocalStorageState';
 
 function NickGenerator() {
-    const [colours, setColours] = useState(['#ff00ff', '#00ff00']);
-    const [numberOfColours, setNumberOfColours] = useState(2);
-    const [name, setName] = useState('Nickname');
-    const maxColours = 4;
+    // const [colours, setColours] = useState(['#ff00ff', '#00ff00']);
+    // const [numberOfColours, setNumberOfColours] = useState(2);
+    // const [name, setName] = useState('Nickname');
+    const [colours, setColours] = useLocalStorageState('colours',['#ff00ff', '#00ff00']);
+    const [numberOfColours, setNumberOfColours] = useLocalStorageState('numOfColours',2);
+    const [name, setName] = useLocalStorageState('nickname','Nickname');
+    const maxColours = 5;
 
     let gradient = chroma.scale(colours).mode('lab');
 
@@ -43,7 +47,8 @@ function NickGenerator() {
                 <input
                     maxLength="16"
                     type="text"
-                    id="name" 
+                    id="name"
+                    value={name}
                     placeholder="nick" 
                     onChange={handleNickChange}/>
             </div>
