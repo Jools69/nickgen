@@ -19,16 +19,17 @@
 
 .copyButton {
     margin: 15px 0 0 0 ;
-    width: 120px;
-    height: 40px;
-    border-radius: 5px;
+    width: 7em;
+    height: 2.3em;
+    border-radius: 0.3em;
     background: #fff;
     padding: 5px;
-    color: gray;
-    font-size: 0.7em;
+    color: rgb(127, 72, 145);
+    font-size: 0.6em;
     font-weight: bold;
     border: none;
     outline: none;
+    transition: all 0.2s;
 }
 
 .copyButton:hover {

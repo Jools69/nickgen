@@ -1,0 +1,18 @@
+/* .CharacterContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+} */
+
+.Character {
+    /* height: 50px;
+    width: 30px; */
+    letter-spacing: 0.2em;
+    font-size: 2em;
+}
+
+/* input[type=radio] {
+    width: 1em;
+    margin: 0;
+} */

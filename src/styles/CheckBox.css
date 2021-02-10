@@ -1,0 +1,12 @@
+.CheckBox label {
+    font-size: 0.5em;
+    display: block;
+}
+
+
+.CheckBox input[type=checkbox] {
+    height: 1.5em;
+    width: 1.5em;
+    margin: 0.5em;
+    cursor: pointer;
+}

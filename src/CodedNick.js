@@ -2,11 +2,10 @@ import './styles/CodedNick.css';
 
 function CodedNick(props) {
 
-    const { nick, gradient } = props;
+    const { nick } = props;
 
-    const codedString = '/nick ' + nick.split('').map((c, i) => {
-        const offset = (1.0 / (nick.length - 1)) * i;
-        return `&${gradient(offset)}&l${c}`
+    const codedString = '/nick ' + nick.map((c) => {
+        return `&${c.colour}${c.bold ? '&l' : ''}${c.strikethrough ? '&m' : ''}${c.underline ? '&n' : ''}${c.italic ? '&o' : ''}${c.char}`
     }).join('');
 
     return (

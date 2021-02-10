@@ -4,7 +4,6 @@ function ColourPickers(props) {
     const { colours, updateColour } = props;
 
     const pickers = colours.map((c, i) => {
-        console.log(c);
         return (
             <input 
                 key={i} 
