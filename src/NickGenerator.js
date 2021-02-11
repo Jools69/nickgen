@@ -13,8 +13,8 @@ import useLocalStorageReducer from './hooks/useLocalStorageReducer';
 function globalStylesReducer(state, action) {
     switch (action.type) {
         case 'field':
-            return {...state, [action.field]: action.value};
-        case  'name':
+            return { ...state, [action.field]: action.value };
+        case 'name':
             return state;
         default:
             return state;
@@ -75,14 +75,23 @@ function NickGenerator() {
 
     let gradient = chroma.scale(colours).mode('lab');
 
+    const toggleLock = (i) => {
+        const tempName = [...name];
+        tempName[i].locked = !tempName[i].locked;
+        setName(tempName);
+    }
+
     let characters = name.map((c, i) => {
-        return (<Character key={i} 
-                           colour={c.colour} 
-                           value={c.char} 
-                           bold={c.bold} 
-                           italic={c.italic}
-                           strikethrough={c.strikethrough}
-                           underline={c.underline}/>);
+        return (<Character key={i}
+            index={i}
+            colour={c.colour}
+            value={c.char}
+            bold={c.bold}
+            italic={c.italic}
+            strikethrough={c.strikethrough}
+            underline={c.underline}
+            locked={c.locked}
+            toggleLock={toggleLock} />);
     });
 
     const updateNumberOfColours = (e) => {
@@ -100,8 +109,8 @@ function NickGenerator() {
     const handleCheckedChange = (e) => {
         const value = e.target.checked;
         const field = e.target.name;
-        dispatch({type: 'field', field, value});
-    
+        dispatch({ type: 'field', field, value });
+
         let tempName = [...name];
         tempName = mapAttrToName(tempName, e.target.name, value);
         setName(tempName);
@@ -109,7 +118,7 @@ function NickGenerator() {
 
     const handleKeyDown = (e) => {
         // we need to ensure that any spaces the user enters are ignored.
-        if(e.key === " ")
+        if (e.key === " ")
             e.preventDefault();
     }
 
@@ -150,23 +159,45 @@ function NickGenerator() {
         setName(tempName);
     }
 
-    const mapGradientToName = (n) => {
+    const mapGradientToName = (n, override = false) => {
         // Copy the current name object into a temp placeholder.
         const tempName = n.map((c, i) => {
             const offset = (1.0 / (n.length - 1)) * i;
-            return ({ ...c, colour: gradient(offset) });
+            return (c.locked && !override) ? c : { ...c, colour: gradient(offset) };
         });
         return tempName;
     }
 
     const mapAttrToName = (n, attr, val) => {
-        return n.map(c => ({...c, [attr]:val}));
+        return n.map(c => {
+            return c.locked ? c : { ...c, [attr]: val };
+        });
+    }
+
+    const lockAll = () => {
+        const tempName = name.map(c => ({...c, locked: true}));
+        setName(tempName);
+    }
+
+    const unlockAll = () => {
+        const tempName = name.map(c => ({...c, locked: false}));
+        setName(tempName);
+    }
+
+    const toggleLocks = () => {
+        const tempName = name.map(c => ({...c, locked: !c.locked}));
+        setName(tempName);
     }
 
     useEffect(() => {
         setName(mapGradientToName(name));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [colours]);
+
+    useEffect(() => {
+        setName(mapGradientToName(name, true));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="container">
@@ -180,20 +211,41 @@ function NickGenerator() {
             </div>
             <div className="NickGenerator">
                 <div className="nameInput">
-                    <div><label for="name">Enter your nick:</label></div>
+                    <div><label htmlFor="name">Enter your nick:</label></div>
                     <input
                         maxLength="16"
                         type="text"
                         id="name"
                         value={name.map(c => c.char).join('')}
                         placeholder="nick"
-                        onChange={handleNickChange} 
-                        onKeyDown={handleKeyDown}/>
+                        onChange={handleNickChange}
+                        onKeyDown={handleKeyDown} />
                 </div>
                 <div className="Colours">
                     {characters}
                 </div>
+                <div className="LockControls">
+                    <div className="control" onClick={lockAll}>
+                        <span>Lock All: </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-lock" viewBox="0 0 16 16">
+                            <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
+                        </svg>
+                    </div>
+                    <div className="control" onClick={unlockAll}>
+                        <span>Unlock All: </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-unlock" viewBox="0 0 16 16">
+                            <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2zM3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H3z" />
+                        </svg>
+                    </div>
+                    <div className="control" onClick={toggleLocks}>
+                        <span>Toggle Locks: </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-toggles" viewBox="0 0 16 16">
+                            <path d="M4.5 9a3.5 3.5 0 1 0 0 7h7a3.5 3.5 0 1 0 0-7h-7zm7 6a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm-7-14a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zm2.45 0A3.49 3.49 0 0 1 8 3.5 3.49 3.49 0 0 1 6.95 6h4.55a2.5 2.5 0 0 0 0-5H6.95zM4.5 0h7a3.5 3.5 0 1 1 0 7h-7a3.5 3.5 0 1 1 0-7z" />
+                        </svg>
+                    </div>
+                </div>
                 <ColoursSlider
+                    className="ColourSlider"
                     numberOfColours={numberOfColours}
                     maxNumOfColours={maxColours}
                     handleSliderChange={updateNumberOfColours} />

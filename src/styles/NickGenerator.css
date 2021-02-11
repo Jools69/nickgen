@@ -44,6 +44,7 @@
     display: flex;
     height: 100px;
     align-items: center;
+    margin-bottom: 1em;
 }
 
 .Char {
@@ -63,4 +64,24 @@
     font-size: 0.7em;
     outline: none;
     text-align: center;
+}
+
+.LockControls {
+    font-size: 0.5em;
+    color:rgb(181, 156, 196);
+}
+
+.LockControls svg {
+    color: white;
+    padding: 0 1em 0 0;
+}
+
+.LockControls .control {
+    display: inline-block;
+    opacity: 0.5;
+}
+
+.LockControls .control:hover {
+    cursor: pointer;
+    opacity: 1.0;
 }
