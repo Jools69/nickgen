@@ -8,7 +8,9 @@ import Character from './Character';
 import CheckBox from './CheckBox';
 import useLocalStorageState from './hooks/useLocalStorageState';
 import useLocalStorageReducer from './hooks/useLocalStorageReducer';
-
+import { useFirstRender } from './hooks/useFirstRender';
+import initialNick from './data/initialNickState';
+import globalStyleState from './data/initialGlobalStylesState';
 
 function NickGenerator() {
 
@@ -22,48 +24,6 @@ function NickGenerator() {
                 return state;
         }
     }
-    
-    const globalStyleState = {
-        bold: false,
-        underline: false,
-        strikethrough: false,
-        italic: false,
-    };
-
-    let initialNick = [
-        {
-            bold: false,
-            strikethrough: false,
-            underline: false,
-            magic: false,
-            char: 'N',
-            colour: '#ffffff'
-        },
-        {
-            bold: false,
-            strikethrough: false,
-            underline: false,
-            magic: false,
-            char: 'i',
-            colour: '#ffffff'
-        },
-        {
-            bold: false,
-            strikethrough: false,
-            underline: false,
-            magic: false,
-            char: 'c',
-            colour: '#ffffff'
-        },
-        {
-            bold: false,
-            strikethrough: false,
-            underline: false,
-            magic: false,
-            char: 'k',
-            colour: '#ffffff'
-        }
-    ];
 
     const [colours, setColours] = useLocalStorageState('colours', ['#ff00ff', '#00ff00']);
     const [numberOfColours, setNumberOfColours] = useLocalStorageState('numOfColours', 2);
@@ -71,6 +31,8 @@ function NickGenerator() {
     const maxColours = 5;
 
     const [state, dispatch] = useLocalStorageReducer('globalStyles', globalStyleState, globalStylesReducer);
+
+    const firstRender = useFirstRender();
 
     let gradient = chroma.scale(colours).mode('lab');
 
@@ -198,25 +160,42 @@ function NickGenerator() {
         setName(tempName);
     }
     
-    const mapGradientToName = (n, override = false) => {
+    // const mapGradientToName = (n, override = false) => {
+    //     // Copy the current name object into a temp placeholder.
+    //     const tempName = n.map((c, i) => {
+    //         const offset = (1.0 / (n.length - 1)) * i;
+    //         return (c.locked && !override) ? c : { ...c, colour: gradient(offset) };
+    //     });
+    //     return tempName;
+    // }
+    
+    const mapGradientToName = (name, override = false) => {
         // Copy the current name object into a temp placeholder.
-        const tempName = n.map((c, i) => {
-            const offset = (1.0 / (n.length - 1)) * i;
-            return (c.locked && !override) ? c : { ...c, colour: gradient(offset) };
+        let unlockedName = name.map((c, i) => ({char: c, ogIndex: i})).filter(el => (!el.char.locked) || override);
+        const tempName = unlockedName.map((el, index) => {
+            const offset = (1.0 / (unlockedName.length - 1)) * index;
+            return { ...el, char: {...el.char, colour: gradient(offset)}};
         });
-        return tempName;
+        // Here, we have the unlocked chars in an array, with the gradient applied, with ogIndex
+        // Now we need to map through the input name array, and if we have a matching ogIndex in
+        // tempName, we need to return the tempName char, else the input char.
+        const mappedName = name.map ((char, index) => {
+            const unlockedIndex = tempName.findIndex(el => el.ogIndex === index);
+            if(unlockedIndex > -1)
+                return tempName[unlockedIndex].char;
+            else
+                return char;
+        });
+        return mappedName;
     }
 
+
+
     useEffect(() => {
-        setName(mapGradientToName(name));
+        if(!firstRender)
+            setName(mapGradientToName(name));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [colours]);
-
-    // This is to apply the colours read from local storage when the app runs for the first time.
-    useEffect(() => {
-        setName(mapGradientToName(name, true));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     return (
         <div className="container">

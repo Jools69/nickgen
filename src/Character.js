@@ -1,5 +1,6 @@
 import React from 'react';
 import './styles/Character.css';
+import chroma from 'chroma-js';
 
 function Character(props) {
 
@@ -12,7 +13,7 @@ const { index, colour, value, bold, strikethrough, italic, underline, locked, to
         < div className="CharacterContainer">
             <span className="Character" 
                 style={{ 
-                        color: colour, 
+                        color: chroma(...colour._rgb), 
                         fontWeight: fontWeight,
                         fontStyle: fontStyle,
                         textDecoration: textDec }}
