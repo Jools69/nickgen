@@ -8,7 +8,6 @@ const { index, colour, value, bold, strikethrough, italic, underline, locked, to
     const fontWeight = bold ? 700 : 400;
     const textDec = `${strikethrough?'line-through ':''}${underline?'underline ':''}`;
     const fontStyle = `${italic?'italic':'normal'}`;
-    console.log(' Character colour: ', colour);
     return (
         < div className="CharacterContainer">
             <span className="Character" 

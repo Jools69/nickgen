@@ -10,25 +10,25 @@ import useLocalStorageState from './hooks/useLocalStorageState';
 import useLocalStorageReducer from './hooks/useLocalStorageReducer';
 
 
-function globalStylesReducer(state, action) {
-    switch (action.type) {
-        case 'field':
-            return { ...state, [action.field]: action.value };
-        case 'name':
-            return state;
-        default:
-            return state;
-    }
-}
-
-const globalStyleState = {
-    bold: false,
-    underline: false,
-    strikethrough: false,
-    italic: false,
-};
-
 function NickGenerator() {
+
+    function globalStylesReducer(state, action) {
+        switch (action.type) {
+            case 'field':
+                return { ...state, [action.field]: action.value };
+            case 'resetStyles':
+                return action.value;
+            default:
+                return state;
+        }
+    }
+    
+    const globalStyleState = {
+        bold: false,
+        underline: false,
+        strikethrough: false,
+        italic: false,
+    };
 
     let initialNick = [
         {
@@ -70,17 +70,33 @@ function NickGenerator() {
     const [name, setName] = useLocalStorageState('name', initialNick);
     const maxColours = 5;
 
-    // const [state, dispatch] = useReducer(globalStylesReducer, globalStyleState);
     const [state, dispatch] = useLocalStorageReducer('globalStyles', globalStyleState, globalStylesReducer);
 
     let gradient = chroma.scale(colours).mode('lab');
 
     const toggleLock = (i) => {
-        const tempName = [...name];
+        let tempName = [...name];
         tempName[i].locked = !tempName[i].locked;
+        //tempName = mapGradientToName(tempName);
         setName(tempName);
     }
 
+    const lockAll = () => {
+        let tempName = name.map(c => ({...c, locked: true}));
+        setName(tempName);
+    }
+
+    const unlockAll = () => {
+        let tempName = name.map(c => ({...c, locked: false}));
+        //tempName = mapGradientToName(tempName);
+        setName(tempName);
+    }
+
+    const toggleLocks = () => {
+        let tempName = name.map(c => ({...c, locked: !c.locked}));
+        setName(tempName);
+    }
+    
     let characters = name.map((c, i) => {
         return (<Character key={i}
             index={i}
@@ -104,6 +120,12 @@ function NickGenerator() {
         const newColours = [...colours];
         newColours[index] = newColour;
         setColours(newColours);
+    }
+
+    const mapAttrToName = (n, attr, val) => {
+        return n.map(c => {
+            return c.locked ? c : { ...c, [attr]: val };
+        });
     }
 
     const handleCheckedChange = (e) => {
@@ -158,7 +180,24 @@ function NickGenerator() {
         tempName = mapGradientToName(tempName);
         setName(tempName);
     }
-
+ 
+    const handleReset = () => {
+        // This function needs to reset all locks to unlocked, and remove
+        // all global styles, and clear the checkboxes.
+        const clearedStyles = {
+            bold: false,
+            underline: false,
+            strikethrough: false,
+            italic: false,
+        };
+        dispatch({ type: 'resetStyles', value: clearedStyles });
+        
+        // clear all of the styles in the name object.
+        let tempName = name.map(c => ({...c, ...clearedStyles, locked: false}));
+        //tempName = mapGradientToName(tempName);
+        setName(tempName);
+    }
+    
     const mapGradientToName = (n, override = false) => {
         // Copy the current name object into a temp placeholder.
         const tempName = n.map((c, i) => {
@@ -168,32 +207,12 @@ function NickGenerator() {
         return tempName;
     }
 
-    const mapAttrToName = (n, attr, val) => {
-        return n.map(c => {
-            return c.locked ? c : { ...c, [attr]: val };
-        });
-    }
-
-    const lockAll = () => {
-        const tempName = name.map(c => ({...c, locked: true}));
-        setName(tempName);
-    }
-
-    const unlockAll = () => {
-        const tempName = name.map(c => ({...c, locked: false}));
-        setName(tempName);
-    }
-
-    const toggleLocks = () => {
-        const tempName = name.map(c => ({...c, locked: !c.locked}));
-        setName(tempName);
-    }
-
     useEffect(() => {
         setName(mapGradientToName(name));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [colours]);
 
+    // This is to apply the colours read from local storage when the app runs for the first time.
     useEffect(() => {
         setName(mapGradientToName(name, true));
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -207,7 +226,9 @@ function NickGenerator() {
                 <CheckBox label='All Underline' name='underline' handleChange={handleCheckedChange} checked={state.underline} />
                 <CheckBox label='All Strikethrough' name='strikethrough' handleChange={handleCheckedChange} checked={state.strikethrough} />
                 <CheckBox label='All Italic' name='italic' handleChange={handleCheckedChange} checked={state.italic} />
-                <h6>Colour</h6>
+                {/* <h6>Colour</h6> */}
+                {/* <h6>Reset</h6> */}
+                <button type='button' className='resetButton' onClick={handleReset}>Reset All</button>
             </div>
             <div className="NickGenerator">
                 <div className="nameInput">
