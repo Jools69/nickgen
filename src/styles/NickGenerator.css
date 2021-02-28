@@ -40,11 +40,11 @@
     width: 80%;
 }
 
-.Colours {
+.Preview {
     display: flex;
-    height: 100px;
+    /* height: 100px; */
     align-items: center;
-    margin-bottom: 1em;
+    margin: 0.5em;
 }
 
 .Char {
@@ -73,7 +73,7 @@
     flex-direction: row;
 }
 
-.LockControls svg {
+.LockControls .icon {
     color: white;
     padding: 0 1em 0 0;
     margin-left: 5px;
@@ -114,4 +114,22 @@
 .resetButton:active {
     box-shadow: black 1px 1px 5px;
     transform: translateY(4px) translateX(4px);
+}
+
+.radioContainer {
+    margin-bottom: 3em;
+}
+
+.colourMode {
+    padding: 3px 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.colourMode label{
+    font-size: 0.5em;
+    padding-left: 0.5em;
 }

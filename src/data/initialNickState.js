@@ -1,3 +1,5 @@
+import chroma from 'chroma-js';
+
 export const initialNick = [
     {
         bold: false,
@@ -5,7 +7,7 @@ export const initialNick = [
         underline: false,
         magic: false,
         char: 'N',
-        colour: '#ffffff'
+        colour: chroma('#ffffff')
     },
     {
         bold: false,
@@ -13,7 +15,7 @@ export const initialNick = [
         underline: false,
         magic: false,
         char: 'i',
-        colour: '#ffffff'
+        colour: chroma('#ffffff')
     },
     {
         bold: false,
@@ -21,7 +23,7 @@ export const initialNick = [
         underline: false,
         magic: false,
         char: 'c',
-        colour: '#ffffff'
+        colour: chroma('#ffffff')
     },
     {
         bold: false,
@@ -29,7 +31,7 @@ export const initialNick = [
         underline: false,
         magic: false,
         char: 'k',
-        colour: '#ffffff'
+        colour: chroma('#ffffff')
     }
 ];
 

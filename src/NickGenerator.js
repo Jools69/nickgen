@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext, Fragment } from 'react';
 import chroma from 'chroma-js';
 import './styles/NickGenerator.css';
 import ColoursSlider from './ColoursSlider';
@@ -6,59 +6,42 @@ import ColourPickers from './ColourPickers';
 import CodedNick from './CodedNick';
 import Character from './Character';
 import CheckBox from './CheckBox';
-import useLocalStorageState from './hooks/useLocalStorageState';
-import useLocalStorageReducer from './hooks/useLocalStorageReducer';
+import { colourModes } from './data/colourModes';
 import { useFirstRender } from './hooks/useFirstRender';
-import initialNick from './data/initialNickState';
-import globalStyleState from './data/initialGlobalStylesState';
+import { NickGenContext, DispatchContext } from './contexts/nickGen.context';
 
 function NickGenerator() {
 
-    function globalStylesReducer(state, action) {
-        switch (action.type) {
-            case 'field':
-                return { ...state, [action.field]: action.value };
-            case 'resetStyles':
-                return action.value;
-            default:
-                return state;
-        }
-    }
-
-    const [colours, setColours] = useLocalStorageState('colours', ['#ff00ff', '#00ff00']);
-    const [numberOfColours, setNumberOfColours] = useLocalStorageState('numOfColours', 2);
-    const [name, setName] = useLocalStorageState('name', initialNick);
     const maxColours = 5;
 
-    const [state, dispatch] = useLocalStorageReducer('globalStyles', globalStyleState, globalStylesReducer);
+    const state = useContext(NickGenContext);
+    const dispatch = useContext(DispatchContext);
+
+    const { colours, numberOfColours, name, colourMode, singleColour } = state;
+    const { bold, strikethrough, underline, italic } = state.globalStyles;
 
     const firstRender = useFirstRender();
 
-    let gradient = chroma.scale(colours).mode('lab');
-
     const toggleLock = (i) => {
-        let tempName = [...name];
-        tempName[i].locked = !tempName[i].locked;
-        //tempName = mapGradientToName(tempName);
-        setName(tempName);
+        dispatch({ type: 'toggleLock', index: i });
     }
 
     const lockAll = () => {
-        let tempName = name.map(c => ({...c, locked: true}));
-        setName(tempName);
+        dispatch({ type: 'lockAll' });
     }
 
     const unlockAll = () => {
-        let tempName = name.map(c => ({...c, locked: false}));
-        //tempName = mapGradientToName(tempName);
-        setName(tempName);
+        dispatch({ type: 'unlockAll' });
     }
 
     const toggleLocks = () => {
-        let tempName = name.map(c => ({...c, locked: !c.locked}));
-        setName(tempName);
+        dispatch({ type: 'toggleLocks' })
     }
-    
+
+    const updateCharColour = (i, colour) => {
+        dispatch({ type: 'updateCharColour', index: i, colour: chroma(colour) });
+    }
+
     let characters = name.map((c, i) => {
         return (<Character key={i}
             index={i}
@@ -69,35 +52,31 @@ function NickGenerator() {
             strikethrough={c.strikethrough}
             underline={c.underline}
             locked={c.locked}
-            toggleLock={toggleLock} />);
+            toggleLock={toggleLock}
+            updateCharColour={updateCharColour} />);
     });
 
     const updateNumberOfColours = (e) => {
-        setNumberOfColours(e);
-        const newColours = [...colours].concat(['#ffffff', '#ffffff']).splice(0, e);
-        setColours(newColours);
+        dispatch({ type: 'changeNumberOfColours', to: e });
     };
 
     const updateColour = (index, newColour) => {
-        const newColours = [...colours];
-        newColours[index] = newColour;
-        setColours(newColours);
+        dispatch({ type: 'updateColour', index: index, to: newColour });
     }
 
-    const mapAttrToName = (n, attr, val) => {
-        return n.map(c => {
-            return c.locked ? c : { ...c, [attr]: val };
-        });
+    const updateSingleColour = (i, newColour) => {
+        dispatch({type: 'updateSingleColour', to: newColour});
     }
 
     const handleCheckedChange = (e) => {
         const value = e.target.checked;
         const field = e.target.name;
-        dispatch({ type: 'field', field, value });
+        dispatch({ type: 'globalStyle', field, value });
+        dispatch({ type: 'applyStyleToName', field, value })
+    }
 
-        let tempName = [...name];
-        tempName = mapAttrToName(tempName, e.target.name, value);
-        setName(tempName);
+    const handleRadioChange = (e) => {
+        dispatch({ type: 'changeColourMode', mode: e.target.value });
     }
 
     const handleKeyDown = (e) => {
@@ -107,107 +86,70 @@ function NickGenerator() {
     }
 
     const handleNickChange = (e) => {
-        // Pull out the updated name from the input
-        const newName = e.target.value;
-
-        // Create a copy of the current name array
-        let tempName = [...name];
-
-        // If the new name is less than the current name, we need to truncate the copy to match;
-        if (newName.length < tempName.length)
-            tempName = tempName.slice(0, newName.length);
-        else if (newName.length > tempName.length) {
-            // We need to append instances of the char object onto tempName until it's the correct length.
-            while (newName.length > tempName.length) {
-                tempName.push({
-                    bold: state.bold,
-                    strikethrough: state.strikethrough,
-                    underline: state.underline,
-                    italic: state.italic,
-                    magic: false,
-                    char: '',
-                    colour: '#ffffff'
-                });
-            }
-        }
-        // At this point, tempName = the correct length of newName.
-        // Now we need to map the characters from the new name into the tempName object
-        tempName = tempName.map((c, i) => {
-            return (
-                { ...c, char: newName.charAt(i) }
-            );
-        });
-
-        // and update the state.
-        tempName = mapGradientToName(tempName);
-        setName(tempName);
+        dispatch({ type: 'updateNick', newName: e.target.value });
     }
- 
+
     const handleReset = () => {
         // This function needs to reset all locks to unlocked, and remove
         // all global styles, and clear the checkboxes.
-        const clearedStyles = {
-            bold: false,
-            underline: false,
-            strikethrough: false,
-            italic: false,
-        };
-        dispatch({ type: 'resetStyles', value: clearedStyles });
-        
-        // clear all of the styles in the name object.
-        let tempName = name.map(c => ({...c, ...clearedStyles, locked: false}));
-        //tempName = mapGradientToName(tempName);
-        setName(tempName);
+        dispatch({ type: 'resetStyles' });
     }
-    
-    // const mapGradientToName = (n, override = false) => {
-    //     // Copy the current name object into a temp placeholder.
-    //     const tempName = n.map((c, i) => {
-    //         const offset = (1.0 / (n.length - 1)) * i;
-    //         return (c.locked && !override) ? c : { ...c, colour: gradient(offset) };
-    //     });
-    //     return tempName;
-    // }
-    
-    const mapGradientToName = (name, override = false) => {
-        // Copy the current name object into a temp placeholder.
-        let unlockedName = name.map((c, i) => ({char: c, ogIndex: i})).filter(el => (!el.char.locked) || override);
-        const tempName = unlockedName.map((el, index) => {
-            const offset = (1.0 / (unlockedName.length - 1)) * index;
-            return { ...el, char: {...el.char, colour: gradient(offset)}};
-        });
-        // Here, we have the unlocked chars in an array, with the gradient applied, with ogIndex
-        // Now we need to map through the input name array, and if we have a matching ogIndex in
-        // tempName, we need to return the tempName char, else the input char.
-        const mappedName = name.map ((char, index) => {
-            const unlockedIndex = tempName.findIndex(el => el.ogIndex === index);
-            if(unlockedIndex > -1)
-                return tempName[unlockedIndex].char;
-            else
-                return char;
-        });
-        return mappedName;
-    }
-
-
 
     useEffect(() => {
-        if(!firstRender)
-            setName(mapGradientToName(name));
+        if (!firstRender)
+            dispatch({ type: 'applyColours' });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [colours]);
+    }, [colours, singleColour]);
 
     return (
         <div className="container">
             <div className="controlPanel">
                 <h6>Styles</h6>
-                <CheckBox label='All Bold' name='bold' handleChange={handleCheckedChange} checked={state.bold} />
-                <CheckBox label='All Underline' name='underline' handleChange={handleCheckedChange} checked={state.underline} />
-                <CheckBox label='All Strikethrough' name='strikethrough' handleChange={handleCheckedChange} checked={state.strikethrough} />
-                <CheckBox label='All Italic' name='italic' handleChange={handleCheckedChange} checked={state.italic} />
-                {/* <h6>Colour</h6> */}
-                {/* <h6>Reset</h6> */}
+                <CheckBox label='All Bold' name='bold' handleChange={handleCheckedChange} checked={bold} />
+                <CheckBox label='All Underline' name='underline' handleChange={handleCheckedChange} checked={underline} />
+                <CheckBox label='All Strikethrough' name='strikethrough' handleChange={handleCheckedChange} checked={strikethrough} />
+                <CheckBox label='All Italic' name='italic' handleChange={handleCheckedChange} checked={italic} />
                 <button type='button' className='resetButton' onClick={handleReset}>Reset All</button>
+                <h6>Colour Mode</h6>
+                <div className='radioContainer'>
+                    <div className='colourMode'>
+                        <input type='radio'
+                            name='colourType'
+                            id='gradient'
+                            value='gradient'
+                            checked={colourMode === colourModes.gradient}
+                            onChange={handleRadioChange}></input>
+                        <label for='gradient'>Gradient</label>
+                    </div>
+                    <div className='colourMode'>
+                        <input type='radio'
+                            name='colourType'
+                            id='individual'
+                            value='individual'
+                            checked={colourMode === colourModes.individual}
+                            onChange={handleRadioChange}></input>
+                        <label for='individual'>Individual</label>
+                    </div>
+                    <div className='colourMode'>
+                        <input type='radio'
+                            name='colourType'
+                            id='single'
+                            value='single'
+                            checked={colourMode === colourModes.single}
+                            onChange={handleRadioChange}></input>
+                        <label for='single'>Single</label>
+                    </div>
+                    <div className='colourMode'>
+                        <input type='radio'
+                            name='colourType'
+                            id='default'
+                            value='mcDefault'
+                            checked={colourMode === colourModes.mcDefault}
+                            onChange={handleRadioChange}></input>
+                        <label for='default'>Basic</label>
+                    </div>
+                </div>
+                {/* <h6>Reset</h6> */}
             </div>
             <div className="NickGenerator">
                 <div className="nameInput">
@@ -221,37 +163,39 @@ function NickGenerator() {
                         onChange={handleNickChange}
                         onKeyDown={handleKeyDown} />
                 </div>
-                <div className="Colours">
+                <div className="Preview">
                     {characters}
                 </div>
                 <div className="LockControls">
                     <div className="control" onClick={lockAll}>
                         <span>Lock All: </span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-lock" viewBox="0 0 16 16">
-                            <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
-                        </svg>
+                        <object class="icon" type="image/svg+xml" data="lock.svg" />
                     </div>
                     <div className="control" onClick={unlockAll}>
                         <span>Unlock All: </span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-unlock" viewBox="0 0 16 16">
-                            <path d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2zM3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H3z" />
-                        </svg>
+                        <object class="icon" type="image/svg+xml" data="unlock.svg" />
                     </div>
                     <div className="control" onClick={toggleLocks}>
                         <span>Toggle Locks: </span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-toggles" viewBox="0 0 16 16">
-                            <path d="M4.5 9a3.5 3.5 0 1 0 0 7h7a3.5 3.5 0 1 0 0-7h-7zm7 6a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm-7-14a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zm2.45 0A3.49 3.49 0 0 1 8 3.5 3.49 3.49 0 0 1 6.95 6h4.55a2.5 2.5 0 0 0 0-5H6.95zM4.5 0h7a3.5 3.5 0 1 1 0 7h-7a3.5 3.5 0 1 1 0-7z" />
-                        </svg>
+                        <object class="icon" type="image/svg+xml" data="toggle.svg" />
                     </div>
                 </div>
-                <ColoursSlider
-                    className="ColourSlider"
-                    numberOfColours={numberOfColours}
-                    maxNumOfColours={maxColours}
-                    handleSliderChange={updateNumberOfColours} />
-                <div>
-                    <ColourPickers colours={colours} numberOfPickers={numberOfColours} updateColour={updateColour} />
-                </div>
+                {colourMode === colourModes.gradient &&
+                    <Fragment>
+                        <ColoursSlider
+                            className="ColourSlider"
+                            numberOfColours={numberOfColours}
+                            maxNumOfColours={maxColours}
+                            handleSliderChange={updateNumberOfColours} />
+                        <div>
+                            <ColourPickers colours={colours} numberOfPickers={numberOfColours} updateColour={updateColour} />
+                        </div>
+                    </Fragment>}
+                {colourMode === colourModes.single &&
+                    <div>
+                        <ColourPickers colours={[singleColour]} numberOfPickers={1} updateColour={updateSingleColour}/>
+                    </div>
+                }
                 <CodedNick nick={name} />
             </div>
         </div>

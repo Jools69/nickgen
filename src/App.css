@@ -16,6 +16,12 @@
   margin: 37px 0 0 0;
 }
 
+.App h3 {
+  margin-top: 0.3em;
+  margin-bottom: 0.7em;
+  font-weight: 100;
+}
+
 .App-footer {
   min-height: 6vh;
 }

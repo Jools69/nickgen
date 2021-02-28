@@ -6,25 +6,39 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
-    margin: 1em 0 0 0;
+    align-items: center;
+    text-align: center;
+    margin: 0;
 }
 
 .Character {
-    /* height: 50px;
-    width: 30px; */
-    letter-spacing: var(--spacing);
+    margin: 0px 0.1em;
     font-size: 2em;
 }
 
 .CharacterLock {
-    padding: 10px;
+    padding: 3px;
     padding-top: 0px;
-    padding-left: calc(calc(calc(100% - var(--spacing)) / 2) - 10px);
     opacity: 0.5;
 }
 
 .CharacterLock:hover {
     cursor: pointer;
     opacity: 1.0;
+}
+
+.charColourPicker {
+    background-color: rgba(0,0,0,0);
+    width: 1.5em;
+    height: 2em;
+    border-radius: 1px;
+    padding: 0px;
+    margin-top: 1em;
+    border: none;
+    outline: none;
+  }
+
+.charColourPicker:hover {
+  cursor: pointer;
+  box-shadow: #222 5px 5px 10px;
 }

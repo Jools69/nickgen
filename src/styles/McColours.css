@@ -1,0 +1,8 @@
+.McColours {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.McColourBlock {
+    transition: all 0.2s
+}
