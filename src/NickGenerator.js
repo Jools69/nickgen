@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, Fragment } from 'react';
+import React, { useEffect, useContext, useState, Fragment } from 'react';
 import chroma from 'chroma-js';
 import './styles/NickGenerator.css';
 import ColoursSlider from './ColoursSlider';
@@ -17,10 +17,16 @@ function NickGenerator() {
     const state = useContext(NickGenContext);
     const dispatch = useContext(DispatchContext);
 
+    const [defaultPalleteShown, setDefaultPalleteShown] = useState(false);
+
     const { colours, numberOfColours, name, colourMode, singleColour } = state;
-    const { bold, strikethrough, underline, italic } = state.globalStyles;
+    const { bold, strikethrough, underline, italic, magic } = state.globalStyles;
 
     const firstRender = useFirstRender();
+
+    const toggleDefaultPalleteShown = () => {
+        setDefaultPalleteShown(!defaultPalleteShown);
+    }
 
     const toggleLock = (i) => {
         dispatch({ type: 'toggleLock', index: i });
@@ -51,9 +57,12 @@ function NickGenerator() {
             italic={c.italic}
             strikethrough={c.strikethrough}
             underline={c.underline}
+            magic={c.magic}
             locked={c.locked}
             toggleLock={toggleLock}
-            updateCharColour={updateCharColour} />);
+            updateCharColour={updateCharColour}
+            defaultPalleteShown={defaultPalleteShown}
+            toggleDefaultPalleteShown={toggleDefaultPalleteShown} />);
     });
 
     const updateNumberOfColours = (e) => {
@@ -77,6 +86,11 @@ function NickGenerator() {
 
     const handleRadioChange = (e) => {
         dispatch({ type: 'changeColourMode', mode: e.target.value });
+        dispatch({type: 'applyColours'});
+        // Make sure that we reset the defaultPalleteShown flag, else if the colour mode
+        // is changed while it is shown, it won't show next time the default colour mode
+        // is selected.
+        setDefaultPalleteShown(false);
     }
 
     const handleKeyDown = (e) => {
@@ -101,14 +115,20 @@ function NickGenerator() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [colours, singleColour]);
 
+    useEffect(() => {
+        dispatch({type: 'applyColours'});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
         <div className="container">
             <div className="controlPanel">
                 <h6>Styles</h6>
-                <CheckBox label='All Bold' name='bold' handleChange={handleCheckedChange} checked={bold} />
-                <CheckBox label='All Underline' name='underline' handleChange={handleCheckedChange} checked={underline} />
-                <CheckBox label='All Strikethrough' name='strikethrough' handleChange={handleCheckedChange} checked={strikethrough} />
-                <CheckBox label='All Italic' name='italic' handleChange={handleCheckedChange} checked={italic} />
+                <CheckBox label='Bold' name='bold' handleChange={handleCheckedChange} checked={bold} />
+                <CheckBox label='Underline' name='underline' handleChange={handleCheckedChange} checked={underline} />
+                <CheckBox label='Strikethrough' name='strikethrough' handleChange={handleCheckedChange} checked={strikethrough} />
+                <CheckBox label='Italic' name='italic' handleChange={handleCheckedChange} checked={italic} />
+                <CheckBox label='Magic' name='magic' handleChange={handleCheckedChange} checked={magic} />
                 <button type='button' className='resetButton' onClick={handleReset}>Reset All</button>
                 <h6>Colour Mode</h6>
                 <div className='radioContainer'>
@@ -169,15 +189,15 @@ function NickGenerator() {
                 <div className="LockControls">
                     <div className="control" onClick={lockAll}>
                         <span>Lock All: </span>
-                        <object class="icon" type="image/svg+xml" data="lock.svg" />
+                        <object class="icon" type="image/svg+xml" data="lock.svg">lock icon</object>
                     </div>
                     <div className="control" onClick={unlockAll}>
                         <span>Unlock All: </span>
-                        <object class="icon" type="image/svg+xml" data="unlock.svg" />
+                        <object class="icon" type="image/svg+xml" data="unlock.svg">unlock icon</object>
                     </div>
                     <div className="control" onClick={toggleLocks}>
                         <span>Toggle Locks: </span>
-                        <object class="icon" type="image/svg+xml" data="toggle.svg" />
+                        <object class="icon" type="image/svg+xml" data="toggle.svg">toggle lock icon</object>
                     </div>
                 </div>
                 {colourMode === colourModes.gradient &&

@@ -32,7 +32,7 @@ function CodedNick(props) {
 
     const getStyleCodes = (char) => {
         // This function returns the combined style codes in a string for the provided character object.
-        return `${char.bold ? '&l' : ''}${char.strikethrough ? '&m' : ''}${char.underline ? '&n' : ''}${char.italic ? '&o' : ''}`;
+        return `${char.bold ? '&l' : ''}${char.strikethrough ? '&m' : ''}${char.underline ? '&n' : ''}${char.italic ? '&o' : ''}${char.magic ? '&k' : ''}`;
     }
 
     const getColourCode = (char) => {
@@ -120,9 +120,9 @@ function CodedNick(props) {
     }
 
     if (colourMode === colourModes.single) {
-        codedString = '/nick ' + `&${chroma(singleColour).hex()}` + reduceStyles(nick, false).join('');
+        codedString = `/nick &${chroma(singleColour).hex()}${reduceStyles(nick, false).join('')}`;
     }
-    else if (colourMode === colourModes.mcDefault) {
+    else if (colourMode === colourModes.mcDefault || colourMode === colourModes.individual) {
         codedString = '/nick ' + reduceStyles(nick, true).join('');
     }
     else

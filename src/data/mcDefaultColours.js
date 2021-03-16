@@ -76,7 +76,7 @@ export const mcDefaultColours = [
     },
     {
         name: 'White',
-        colour: '#ffffff',
+        colour: '#FFFFFF',
         code: '&f'
     },
 ];

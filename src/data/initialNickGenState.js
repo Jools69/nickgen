@@ -7,6 +7,7 @@ const nickGenState = {
         underline: false,
         strikethrough: false,
         italic: false,
+        magic: false,
     },
     name: [
         {

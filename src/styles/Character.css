@@ -6,20 +6,30 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    text-align: center;
+    align-items: flex-start;
+    /* align-items: center;
+    text-align: center; */
     margin: 0;
 }
 
 .Character {
-    margin: 0px 0.1em;
+    /* margin: 0px 0.1em; */
+    letter-spacing: var(--spacing);
     font-size: 2em;
 }
 
 .CharacterLock {
+    /* padding: 3px; */
+    padding: 10px;
+    padding-top: 0px;
+    padding-left: calc(calc(calc(100% - var(--spacing)) / 2) - 10px);
+    opacity: 0.5;
+}
+
+.colourPickerContainer {
     padding: 3px;
     padding-top: 0px;
-    opacity: 0.5;
+    padding-left: calc(calc(calc(100% - var(--spacing)) / 2) - 13px);
 }
 
 .CharacterLock:hover {
@@ -29,8 +39,8 @@
 
 .charColourPicker {
     background-color: rgba(0,0,0,0);
-    width: 1.5em;
-    height: 2em;
+    width: 1.75em;
+    height: 2.25em;
     border-radius: 1px;
     padding: 0px;
     margin-top: 1em;
