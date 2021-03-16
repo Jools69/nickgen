@@ -169,7 +169,6 @@ function NickGenerator() {
                         <label for='default'>Basic</label>
                     </div>
                 </div>
-                {/* <h6>Reset</h6> */}
             </div>
             <div className="NickGenerator">
                 <div className="nameInput">
