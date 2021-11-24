@@ -1,8 +1,16 @@
+.CheckBox {
+    min-width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
 .CheckBox label {
     font-size: 0.5em;
     display: block;
+    padding-left: 0.25em;
 }
-
 
 .CheckBox input[type=checkbox] {
     height: 1.5em;

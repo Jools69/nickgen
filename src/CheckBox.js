@@ -7,8 +7,8 @@ function CheckBox(props) {
 
     return (
             <div className="CheckBox">
-                <label htmlFor={name}>{label}</label>
                 <input type="checkbox" id={name} name={name} onChange={handleChange} checked={checked ? 'checked' : ''}/>
+                <label htmlFor={name}>{label}</label>
             </div>
     );
 }
