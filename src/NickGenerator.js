@@ -174,7 +174,7 @@ function NickGenerator() {
                 <div className="nameInput">
                     <div><label htmlFor="name">Enter your nick:</label></div>
                     <input
-                        maxLength="16"
+                        // maxLength="16"
                         type="text"
                         id="name"
                         value={name.map(c => c.char).join('')}
