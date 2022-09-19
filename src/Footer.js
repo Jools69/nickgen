@@ -8,7 +8,7 @@ function Footer(props) {
             <div className="footer">
                     <div className="logo">
                         <p className="copyright">
-                            NickGen - Site design © 2021 Jools. All rights reserved.
+                            NickGen - Site design © 2021 <span id="jools">Jools<img id="cooky" src="Cooky.svg" height="50"></img></span>. All rights reserved.
                         </p>
                     </div>
             </div>

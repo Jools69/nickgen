@@ -4,10 +4,42 @@
     justify-content: center;
     text-align: center;
     height: 60px;
-    background-color: rgb(38, 38, 43);
+    background-color: #26262b;
     flex-grow: 0;
 }
 .copyright {
     font-size: 0.75rem;
     color: white;
+    position: relative;
+}
+#cooky {
+    display: none;
+    animation: wiggle 0.5s linear;
+    animation-play-state: paused;
+}
+
+#jools:hover::before{
+    content: 'Hi Jess 💜';
+    font-weight: bold;
+    position: absolute;
+    top: -20px;
+    background-color: rgba(252, 154, 219, 0.955);
+    border-radius: 3px;
+    padding: 3px;
+}
+
+#jools:hover > #cooky {
+    display: inline-block;
+    position: absolute;
+    top: -35px;
+    right: 25px;
+    animation-play-state: running;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(10deg); }
+    40% { transform: rotate(-10deg); }
+    60% { transform: rotate(10deg); }
+    80% { transform: rotate(-10deg); }
 }
